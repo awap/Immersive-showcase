@@ -27,7 +27,7 @@ void main(){
   vGlow = f;
 
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
-  gl_PointSize = (2.2 + aSeed * 2.4 + f * 5.0) * (140.0 / -mv.z) * DPR;
+  gl_PointSize = (1.2 + aSeed * 1.6 + f * 5.0) * (16.0 / -mv.z) * DPR;
   gl_Position = projectionMatrix * mv;
 }`
 
@@ -36,11 +36,11 @@ precision highp float;
 varying float vGlow;
 void main(){
   vec2 c = gl_PointCoord - 0.5;
-  float a = smoothstep(0.5, 0.12, length(c));
+  float a = smoothstep(0.5, 0.15, length(c));
   vec3 iris = vec3(0.557, 0.545, 0.937);
   vec3 amber = vec3(0.894, 0.725, 0.357);
   vec3 col = mix(iris, amber, clamp(vGlow * 2.4, 0.0, 1.0));
-  gl_FragColor = vec4(col, a * 0.85);
+  gl_FragColor = vec4(col, a * 0.55);
 }`
 
 export function initParticles(canvas: HTMLCanvasElement, q: Quality) {
