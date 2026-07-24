@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Immersive Atlas — 몰입형 웹 기술 표본실 2026</title>
+  <meta name="description" content="Scrollytelling, 셰이더, 파티클, 3D 카메라 — 몰입형 랜딩을 만드는 기술을 라이브 표본으로 해부하는 학습 쇼케이스." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="hero">
+    <canvas class="hero-canvas" data-demo="hero" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+      <p class="eyebrow hero-eyebrow">FIELD GUIDE · 2026 EDITION</p>
+      <h1 class="hero-title">
+        <span class="display">Immersive&nbsp;Atlas</span>
+        <span class="hero-sub">몰입형 웹 기술 표본실</span>
+      </h1>
+      <p class="hero-lede">
+        Awwwards·FWA에서 마주친 몰입형 랜딩은 마법이 아니라 <em>레이어의 조합</em>이다.
+        이 페이지는 그 레이어를 하나씩 꺼내 살아있는 표본으로 전시한다.
+        만지고, 스크롤하고, 각 기술의 성질과 비용과 쓰임을 읽어라.
+        지금 이 화면 뒤에서 움직이는 것도 표본 02의 커스텀 셰이더다.
+      </p>
+      <p class="hero-hint mono" aria-hidden="true">SCROLL TO DISSECT ↓</p>
+    </div>
+  </header>
+
+  <!-- ============ NAV RAIL ============ -->
+  <nav class="rail" aria-label="표본 목차">
+    <ol>
+      <li><a href="#stack">00 기술 지도</a></li>
+      <li><a href="#scrollytelling">01 스크롤 연출</a></li>
+      <li><a href="#shader">02 셰이더</a></li>
+      <li><a href="#particles">03 파티클</a></li>
+      <li><a href="#typography">04 타이포그래피</a></li>
+      <li><a href="#vector">05 SVG</a></li>
+      <li><a href="#css">06 CSS</a></li>
+      <li><a href="#canvas2d">07 Canvas 2D</a></li>
+      <li><a href="#physics">08 가짜 물리</a></li>
+      <li><a href="#audio">09 오디오</a></li>
+      <li><a href="#adaptive">10 적응형 품질</a></li>
+      <li><a href="#pipeline">11 파이프라인</a></li>
+      <li><a href="#recipes">12 조합 레시피</a></li>
+      <li><a href="#antipatterns">13 안티패턴</a></li>
+      <li><a href="#references">14 레퍼런스</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ DEVICE TIER HUD (signature) ============ -->
+  <aside class="hud mono" id="hud" aria-label="현재 기기 품질 판정">
+    <p class="hud-title">YOUR DEVICE · LIVE</p>
+    <dl>
+      <div><dt>TIER</dt><dd id="hud-tier">—</dd></div>
+      <div><dt>WEBGPU</dt><dd id="hud-webgpu">—</dd></div>
+      <div><dt>DPR</dt><dd id="hud-dpr">—</dd></div>
+      <div><dt>MOTION</dt><dd id="hud-motion">—</dd></div>
+      <div><dt>FPS</dt><dd id="hud-fps">—</dd></div>
+    </dl>
+  </aside>
+
+  <main>
+
+  <!-- ============ 00 STACK MAP ============ -->
+  <section class="specimen" id="stack">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 00 · 전체 구조</p>
+      <h2><span class="display">The Stack</span><span class="kr">몰입형 웹은 레이어의 조합이다</span></h2>
+      <p class="lede">
+        Immersive Website는 "3D가 들어간 사이트"가 아니라 여러 레이어가 하나의 타임라인처럼
+        움직이는 경험이다. 완성도는 3D 기술 자체가 아니라 <strong>DOM과 GPU 장면의 동기화,
+        자산 최적화, 저사양 폴백 설계</strong>에서 갈린다.
+      </p>
+    </header>
+    <div class="stack-map" id="stack-map">
+      <div class="stack-layer" data-layer="framework">
+        <h3 class="mono">APPLICATION FRAMEWORK</h3>
+        <p>Next.js · Astro · Vite · SvelteKit</p>
+        <p class="stack-note">누가 페이지를 소유하는가 — 운영형이면 Next.js, 콘텐츠형이면 Astro, 작품형이면 Vite</p>
+      </div>
+      <div class="stack-layer" data-layer="motion">
+        <h3 class="mono">INTERACTION &amp; MOTION</h3>
+        <p>GSAP · Motion · Lenis · Theatre.js</p>
+        <p class="stack-note">누가 시간을 지배하는가 — 표본 01 · 04 · 08 · 09가 이 층에 산다</p>
+      </div>
+      <div class="stack-layer" data-layer="render">
+        <h3 class="mono">VISUAL RENDERING</h3>
+        <p>CSS · SVG · Canvas 2D · Three.js / R3F · Babylon · WebGL / WebGPU</p>
+        <p class="stack-note">누가 픽셀을 그리는가 — 표본 02 · 03 · 05 · 06 · 07이 이 층에 산다</p>
+      </div>
+      <div class="stack-layer" data-layer="production">
+        <h3 class="mono">VISUAL PRODUCTION</h3>
+        <p>Blender · Cinema 4D · Houdini · Spline · Rive · Substance</p>
+        <p class="stack-note">형상은 코드 밖에서 온다 — 표본 11 파이프라인 참조</p>
+      </div>
+      <div class="stack-layer" data-layer="asset">
+        <h3 class="mono">ASSET PIPELINE</h3>
+        <p>glTF / GLB · Draco · Meshopt · KTX2 · WebP / AVIF / WebM</p>
+        <p class="stack-note">텍스처가 모델보다 큰 병목인 경우가 많다</p>
+      </div>
+      <div class="stack-layer" data-layer="infra">
+        <h3 class="mono">CONTENT &amp; INFRA</h3>
+        <p>Headless CMS · CDN / Edge · Analytics · Monitoring</p>
+        <p class="stack-note">CMS에는 콘텐츠만 — 카메라 좌표와 셰이더 파라미터는 코드에 둔다</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 SCROLLYTELLING ============ -->
+  <section class="specimen" id="scrollytelling">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 01 · LAYER — INTERACTION &amp; MOTION</p>
+      <h2><span class="display">Scrollytelling</span><span class="kr">스크롤이 카메라를 움직인다</span></h2>
+      <p class="lede">
+        스크롤 위치를 타임라인의 재생 헤드로 쓰는 기법. GSAP ScrollTrigger의
+        <span class="mono inline-tag">pin</span>으로 화면을 고정하고 <span class="mono inline-tag">scrub</span>으로
+        진행도를 카메라·오브젝트·DOM 텍스트에 동시에 묶는다. 아래 구간에서 스크롤은
+        페이지 이동이 아니라 <strong>3D 카메라의 돌리(dolly) 조작</strong>이 된다.
+      </p>
+    </header>
+
+    <div class="scrolly-stage" id="scrolly-stage">
+      <div class="scrolly-pin">
+        <canvas data-demo="scrolly" aria-hidden="true"></canvas>
+        <div class="scrolly-captions" aria-hidden="true">
+          <p class="scrolly-caption" data-step="0"><span class="mono">PHASE 1</span>하나의 타임라인이 카메라 위치를 소유한다</p>
+          <p class="scrolly-caption" data-step="1"><span class="mono">PHASE 2</span>같은 타임라인이 DOM 텍스트도 소유한다 — 이 자막처럼</p>
+          <p class="scrolly-caption" data-step="2"><span class="mono">PHASE 3</span>셰이더 uniform까지 묶으면 장면 전체가 하나의 악보가 된다</p>
+        </div>
+        <div class="scrolly-progress mono" aria-hidden="true"><span id="scrolly-pct">0%</span> SCRUB</div>
+      </div>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>GSAP ScrollTrigger + Three.js</dd></div>
+        <div><dt>COST</dt><dd>메인 스레드 · 트리거 수에 비례</dd></div>
+        <div><dt>FALLBACK</dt><dd>reduced-motion → 정적 프레임</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>GSAP의 본성은 <strong>타임라인</strong>이다. 카메라 좌표, 오브젝트 회전, 셰이더 uniform,
+          DOM opacity, 사운드 볼륨까지 종류가 다른 값들을 하나의 시간축에 묶는 것 —
+          이것이 다른 도구가 흉내 내기 어려운 GSAP의 고유 영역이다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>타임라인이 커지면 수정이 어렵고, 섹션마다 ScrollTrigger를 무분별하게 만들면
+          성능이 무너진다. React와 함께 쓸 때는 중복 실행과 정리(cleanup)가 단골 사고 지점.
+          그리고 <strong>모든 것을 스크롤에 묶으면 정보 위계가 사라진다</strong> — 표본 13 참조.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>제품 분해 시퀀스(Apple AirPods Pro), 브랜드 스토리 챕터 전환(Igloo Inc),
+          데이터 저널리즘의 단계별 연출(The Pudding), 포트폴리오 씬 전환.
+          15~60초짜리 카메라 연출이 많아지면 Theatre.js 같은 키프레임 에디터 병행을 검토한다.</p>
+        </div>
+      </div>
+      <div class="lenis-lab">
+        <h3 class="mono">SUB-SPECIMEN · LENIS</h3>
+        <p>지금 이 페이지의 스크롤 감각은 Lenis가 보간 중이다. 네이티브 스크롤을 대체하는 게 아니라
+        <strong>80% 네이티브 + 20% 보간</strong>이 권장 강도. 아래 버튼으로 차이를 몸으로 비교해보라.
+        (모바일·reduced-motion에서는 자동 비활성화된다 — 그것도 이 기술의 올바른 사용법이다.)</p>
+        <button class="btn" id="lenis-toggle" type="button">Lenis 끄기 — 네이티브 스크롤로</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 SHADER ============ -->
+  <section class="specimen" id="shader">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 02 · LAYER — VISUAL RENDERING</p>
+      <h2><span class="display">Custom Shader</span><span class="kr">"그 사이트만의 느낌"의 출처</span></h2>
+      <p class="lede">
+        몰입형 사이트의 고유한 질감은 대부분 프래그먼트 셰이더에서 나온다.
+        셰이더는 <strong>모든 픽셀에서 동시에 실행되는 작은 프로그램</strong>이고,
+        재료는 좌표·시간·노이즈·포인터뿐이다. 아래 표본을 문질러 보라 —
+        포인터 속도가 uniform으로 흘러 들어가 유체처럼 왜곡된다. 클릭하면 dissolve 전환.
+      </p>
+    </header>
+
+    <div class="stage-frame">
+      <canvas class="stage-canvas" data-demo="shader" aria-hidden="true"></canvas>
+      <p class="stage-hint mono" aria-hidden="true">MOVE TO DISTORT · CLICK TO DISSOLVE</p>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>Three.js ShaderMaterial (GLSL)</dd></div>
+        <div><dt>COST</dt><dd>fragment-bound · 해상도에 비례</dd></div>
+        <div><dt>FALLBACK</dt><dd>WebGL 불가 → 정적 그라디언트</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>GPU는 픽셀 하나하나를 병렬로 계산한다. 그래서 셰이더의 native는
+          <strong>필드(field)</strong> — 좌표를 받아 색을 돌려주는 수학 함수다.
+          noise, fresnel, refraction, dissolve 전부 이 함수의 변주. 언어는 WebGL이면 GLSL,
+          WebGPU면 WGSL, Three.js 신규 프로젝트라면 양쪽으로 변환되는 TSL을 검토한다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>셰이더 오류는 브라우저·GPU마다 다르게 나타난다. 모바일은 fragment 처리량이
+          낮아 화면 전체 셰이더가 발열의 주범이 되기 쉽다. 해상도(DPR) 상한과
+          텍스처 샘플 수 관리가 실전의 절반이다.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>이미지 호버 왜곡, 페이지 전환 dissolve, 히어로 배경의 gradient field,
+          텍스트 리빌의 노이즈 마스크, 유리 굴절(refraction) 카드. 무거운 3D 모델 없이
+          평면 + 셰이더만으로 공간감을 내는 <strong>2.5D</strong>가 2026년의 주류 트렌드다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 PARTICLES ============ -->
+  <section class="specimen" id="particles">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 03 · LAYER — VISUAL RENDERING</p>
+      <h2><span class="display">Particles</span><span class="kr">개체가 아니라 시스템을 설계한다</span></h2>
+      <p class="lede">
+        수천 개의 점 각각에 규칙(노이즈 흐름 + 커서 반발력)을 주면, 완성된 영상이 아니라
+        <strong>실시간으로 실행되는 브랜드 규칙</strong>이 된다. 커서를 넣어 보라 —
+        지금 기기 티어에 맞춰 파티클 수가 자동 조절되어 있다(HUD 참조).
+      </p>
+    </header>
+
+    <div class="stage-frame">
+      <canvas class="stage-canvas" data-demo="particles" aria-hidden="true"></canvas>
+      <p class="stage-hint mono" aria-hidden="true"><span id="particle-count">—</span> POINTS · CURSOR = FORCE FIELD</p>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>Three.js Points + vertex shader</dd></div>
+        <div><dt>COST</dt><dd>수만 개까지 WebGL로 충분 · 수십만~수백만은 WebGPU Compute의 영역</dd></div>
+        <div><dt>FALLBACK</dt><dd>low tier → 개수 1/4 축소</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>파티클의 native는 <strong>인스턴싱</strong> — 같은 정점 프로그램을 N개의 점에
+          병렬 적용하는 것이다. CPU에서 점을 하나씩 움직이면 수천 개가 한계지만,
+          위치 계산을 vertex shader로 옮기면 자릿수가 달라진다.
+          그 다음 자릿수(백만 단위)가 필요할 때 비로소 WebGPU Compute Shader가 등장한다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>파티클 수는 곧 배터리다. "고급 PC에서 60fps"는 의미가 없고 중급 안드로이드에서
+          측정해야 한다. 매 프레임 CPU에서 배열을 갱신해 GPU로 다시 올리는 구현은
+          AI 생성 코드의 단골 실수.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>브랜드 키비주얼(로고가 입자로 흩어졌다 모이는 연출), 데이터 포인트 시각화,
+          커서 트레일, 텍스트→입자 전환. Gaussian Splatting도 본질은 "점 수백만 개를
+          찍는 것"이라 이 표본의 연장선에 있다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 TYPOGRAPHY ============ -->
+  <section class="specimen" id="typography">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 04 · LAYER — INTERACTION &amp; MOTION</p>
+      <h2><span class="display">Kinetic Type</span><span class="kr">글자는 DOM에 남긴 채 움직인다</span></h2>
+      <p class="lede">
+        텍스트를 Canvas에 그리는 순간 접근성과 SEO를 잃는다. 정답은 진짜 HTML 텍스트를
+        글자 단위로 쪼개(<span class="mono inline-tag">SplitText</span> 계열) transform만 애니메이션하는 것.
+        아래 문장은 실제 선택 가능한 DOM 텍스트다 — 스크롤에 따라 글자들이 조판된다.
+      </p>
+    </header>
+
+    <div class="type-stage" id="type-stage">
+      <p class="type-line" data-split>몰입은 기술이 아니라 시간 설계다</p>
+      <p class="type-line type-line-serif display" data-split>Typography is the interface</p>
+      <p class="type-line" data-split>글자가 움직여도 문서는 문서로 남아야 한다</p>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>DOM split + GSAP stagger</dd></div>
+        <div><dt>COST</dt><dd>글자 수 = 노드 수 · transform/opacity만 쓰면 저렴</dd></div>
+        <div><dt>FALLBACK</dt><dd>reduced-motion → 즉시 표시</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>브라우저는 transform과 opacity를 컴포지터에서 처리한다 — 레이아웃 재계산 없이.
+          그래서 키네틱 타이포의 native는 "글자를 span으로 감싸고 transform만 건드리기"다.
+          width, top 같은 레이아웃 속성을 애니메이션하는 순간 성능 등급이 떨어진다.
+          GSAP SplitText는 3.13부터 무료가 되었다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>수백 글자를 동시에 stagger하면 노드 수가 폭발한다. 스크린리더가 쪼개진 글자를
+          읽지 않도록 원문에 <span class="mono inline-tag">aria-label</span>을 남기는 것이 필수 매너.
+          한글은 조합 문자라 자소 분리 연출은 신중하게.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>히어로 헤드라인 등장, 챕터 제목 리빌, 마퀴(marquee) 스트립, 호버 시 글자 교체.
+          여기에 셰이더를 더하면(텍스트를 텍스처로 구워 왜곡) 표본 02와 합성된다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 SVG ============ -->
+  <section class="specimen" id="vector">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 05 · LAYER — VISUAL RENDERING</p>
+      <h2><span class="display">SVG</span><span class="kr">선이 스스로를 그린다</span></h2>
+      <p class="lede">
+        SVG는 DOM처럼 제어되는 벡터다. <span class="mono inline-tag">stroke-dashoffset</span> 하나로
+        "선이 그려지는" 연출이 되고, path의 좌표를 보간하면 형태가 morph된다.
+        아래 다이어그램은 스크롤 진행도에 따라 제도(製圖)되듯 그려진다.
+      </p>
+    </header>
+
+    <div class="vector-stage" id="vector-stage">
+      <svg id="draw-svg" viewBox="0 0 720 360" fill="none" role="img" aria-label="DOM과 GPU 레이어가 타임라인으로 동기화되는 구조 다이어그램">
+        <path class="draw-path" d="M60 300 L60 60 L300 60" />
+        <path class="draw-path" d="M60 180 C160 180 200 120 300 120" />
+        <path class="draw-path" d="M300 60 L300 180 L540 180" />
+        <path class="draw-path" d="M420 60 L420 300 L660 300" />
+        <path class="draw-path" d="M540 180 C600 180 620 240 660 240" />
+        <circle class="draw-node" cx="60" cy="300" r="7" />
+        <circle class="draw-node" cx="300" cy="60" r="7" />
+        <circle class="draw-node" cx="540" cy="180" r="7" />
+        <circle class="draw-node" cx="660" cy="300" r="7" />
+        <circle class="draw-node" cx="660" cy="240" r="7" />
+        <text class="draw-label" x="48" y="330">DOM</text>
+        <text class="draw-label" x="288" y="44">TIMELINE</text>
+        <text class="draw-label" x="528" y="164">GPU</text>
+        <text class="draw-label" x="600" y="330">OUTPUT</text>
+      </svg>
+      <div class="morph-box">
+        <svg id="morph-svg" viewBox="0 0 200 200" aria-hidden="true">
+          <path id="morph-path" fill="none" />
+        </svg>
+        <button class="btn" id="morph-btn" type="button">Morph — 원 ↔ 별</button>
+      </div>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>SVG + stroke-dashoffset + path 보간</dd></div>
+        <div><dt>COST</dt><dd>CPU 렌더 · 수천 노드부터 병목</dd></div>
+        <div><dt>FALLBACK</dt><dd>불필요 — SVG는 어디서나 그려진다</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>SVG의 native는 <strong>기하학이 곧 마크업</strong>이라는 점이다. path는 검사 가능하고,
+          접근성 트리에 올라가고, 벡터라 어떤 해상도에서도 선명하다. 선 드로잉은 전체 길이
+          (<span class="mono inline-tag">getTotalLength</span>)를 dash로 걸고 offset을 줄이는 단순한 트릭.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>SVG는 GPU가 아니라 CPU 래스터라이저의 영역. 노드 수천 개를 매 프레임 움직이면
+          바로 병목이 온다. 복잡한 morph는 정점 수를 맞춰야 해 제작 비용이 숨어 있다.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>로고 스트로크 애니메이션, 프로세스 다이어그램의 순차 드로잉, 인터랙티브 지도,
+          커서를 따라 휘는 언더라인. Lottie/Rive가 하는 일의 상당수는 "잘 조직된 SVG 연출"이다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 CSS ============ -->
+  <section class="specimen" id="css">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 06 · LAYER — VISUAL RENDERING</p>
+      <h2><span class="display">Pure CSS</span><span class="kr">JS 0바이트의 몰입</span></h2>
+      <p class="lede">
+        모든 효과를 Three.js로 만들 필요는 없다. 아래 네 타일은 JavaScript가 전혀 개입하지 않는다.
+        접근성·SEO·반응형이 공짜로 따라오는, 가장 저렴하고 가장 저평가된 레이어.
+      </p>
+    </header>
+
+    <div class="css-grid">
+      <figure class="css-tile tile-blend">
+        <div class="tile-visual" aria-hidden="true"><span class="blend-disc a"></span><span class="blend-disc b"></span><span class="blend-word display">BLEND</span></div>
+        <figcaption><span class="mono">mix-blend-mode</span> — 레이어끼리 색을 섞는다. 호버하면 디스크가 교차한다.</figcaption>
+      </figure>
+      <figure class="css-tile tile-clip">
+        <div class="tile-visual" aria-hidden="true"><div class="clip-panel"><span class="display">CLIP</span></div></div>
+        <figcaption><span class="mono">clip-path</span> — 다각형으로 잘라내는 리빌. 호버로 창이 열린다.</figcaption>
+      </figure>
+      <figure class="css-tile tile-mask">
+        <div class="tile-visual" aria-hidden="true"><div class="mask-panel"></div></div>
+        <figcaption><span class="mono">mask-image</span> — 그라디언트가 알파 채널이 된다. 셰이더 dissolve의 CSS 사촌.</figcaption>
+      </figure>
+      <figure class="css-tile tile-scrolldriven">
+        <div class="tile-visual" aria-hidden="true"><div class="sd-bar"></div><span class="sd-label mono">SCROLL-DRIVEN</span></div>
+        <figcaption><span class="mono">animation-timeline: scroll()</span> — JS 없는 ScrollTrigger. 페이지를 스크롤하면 바가 찬다.</figcaption>
+      </figure>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>CSS only · 컴포지터 스레드</dd></div>
+        <div><dt>COST</dt><dd>사실상 0 · 메인 스레드 미점유</dd></div>
+        <div><dt>FALLBACK</dt><dd>이것이 폴백이다</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>CSS의 native는 <strong>선언</strong>이다. 상태를 기술하면 브라우저가 최적 경로로 렌더한다.
+          blur·clip-path·mask·blend·view transition·scroll-driven animation까지 —
+          한때 WebGL이 필요했던 연출의 상당수가 이제 이 층으로 내려왔다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>리스크가 가장 적은 층. 다만 blur 반경과 blend는 합성 비용이 있어 남발하면
+          스크롤이 무거워진다. scroll-driven animation은 브라우저 지원 확인 후 점진적 적용.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>텍스트 위주 사이트의 패럴랙스, 이미지 리빌, 다크/라이트 전환, 페이지 전환
+          (View Transitions API). <strong>먼저 CSS로 되는지 묻고, 안 될 때 Canvas로 올라가는 것</strong>이
+          2026년의 올바른 순서다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 CANVAS 2D ============ -->
+  <section class="specimen" id="canvas2d">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 07 · LAYER — VISUAL RENDERING</p>
+      <h2><span class="display">Canvas 2D</span><span class="kr">WebGL 아래의 스케치북</span></h2>
+      <p class="lede">
+        3D도 셰이더도 필요 없는 생성 비주얼이라면 Canvas 2D가 가장 단순한 도구다.
+        아래는 노이즈 흐름장(flow field)을 따라 흐르는 선들 — 커서가 장(場)을 휘게 만든다.
+      </p>
+    </header>
+
+    <div class="stage-frame">
+      <canvas class="stage-canvas" data-demo="canvas2d" aria-hidden="true"></canvas>
+      <p class="stage-hint mono" aria-hidden="true">FLOW FIELD · CURSOR BENDS THE FIELD</p>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>CanvasRenderingContext2D</dd></div>
+        <div><dt>COST</dt><dd>CPU 단일 스레드 · 수천 개체까지</dd></div>
+        <div><dt>FALLBACK</dt><dd>reduced-motion → 정지 프레임</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>Canvas 2D의 native는 <strong>즉시 모드 드로잉</strong> — 매 프레임 지우고 다시 그린다.
+          상태도 장면 그래프도 없어서 알고리즘이 그대로 코드가 된다. 생성 아트, 드로잉 도구,
+          이미지 픽셀 조작의 표준 출발점.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>CPU 한 스레드가 전부라 개체 수 한계가 빨리 온다. 잔상 트릭(반투명 fillRect)은
+          저렴하지만, 픽셀 단위 조작은 putImageData 비용을 확인할 것.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>커서 트레일, 노이즈 텍스처 생성, 서명 패드, 간단한 파티클, 오디오 파형.
+          여기서 개체 수가 부족해지면 표본 03(WebGL 파티클)으로 승급한다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 FAKE PHYSICS ============ -->
+  <section class="specimen" id="physics">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 08 · LAYER — INTERACTION &amp; MOTION</p>
+      <h2><span class="display">Fake Physics</span><span class="kr">진짜 물리보다 나은 거짓말</span></h2>
+      <p class="lede">
+        브랜드 사이트에서 필요한 건 정확한 충돌 계산이 아니라 <strong>살아있는 느낌</strong>이다.
+        스프링 + 감쇠(damping) + 노이즈면 충분하고, 통제는 훨씬 쉽다.
+        아래 오브들을 던져 보라 — Rapier 같은 물리 엔진 없이 수식 몇 줄로 움직인다.
+      </p>
+    </header>
+
+    <div class="physics-stage" id="physics-stage">
+      <div class="orb" data-orb><span class="mono">SPRING</span></div>
+      <div class="orb" data-orb><span class="mono">DAMP</span></div>
+      <div class="orb" data-orb><span class="mono">NOISE</span></div>
+      <p class="stage-hint mono" aria-hidden="true">DRAG &amp; RELEASE · k=0.06 · damping=0.86</p>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>수식 직접 구현 (spring–damper)</dd></div>
+        <div><dt>COST</dt><dd>무시 가능 · 물리 엔진 대비 1/100</dd></div>
+        <div><dt>FALLBACK</dt><dd>reduced-motion → 즉시 복귀</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>스프링의 native는 <span class="mono inline-tag">v += (target − pos) · k; v *= damping; pos += v</span> —
+          이 세 줄이 전부다. 관성, 오버슈트, 되튐이 공짜로 나온다. 진짜 물리 엔진(Rapier)은
+          충돌·스태킹·캐릭터가 필요할 때만 부른다.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>프레임레이트에 따라 감쇠가 달라지는 구현(delta time 미보정)이 흔한 함정.
+          진짜 물리 엔진을 쓰면 물리 루프와 렌더 루프의 동기화, 모바일 CPU 비용이
+          새 문제로 들어온다.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>커서 팔로워, 자석 버튼(magnetic button), 드래그 카드, 메뉴의 탄성 등장,
+          이미지의 관성 패럴랙스. "Direct Manipulation" 트렌드 — 사용자가 관람자가 아니라
+          장면에 개입하게 만드는 핵심 재료다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 09 AUDIO ============ -->
+  <section class="specimen" id="audio">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 09 · LAYER — INTERACTION &amp; MOTION</p>
+      <h2><span class="display">Audio Reactive</span><span class="kr">소리가 비주얼을 연주한다</span></h2>
+      <p class="lede">
+        Web Audio API의 AnalyserNode는 재생 중인 소리의 주파수 스펙트럼을 매 프레임 돌려준다.
+        그 배열을 셰이더 uniform이나 도형 크기에 꽂으면 비주얼이 음악을 연주한다.
+        브라우저 정책상 <strong>소리는 반드시 사용자의 클릭으로만 시작</strong>된다 — 그래서 버튼이 있다.
+      </p>
+    </header>
+
+    <div class="stage-frame audio-frame">
+      <canvas class="stage-canvas" data-demo="audio" aria-hidden="true"></canvas>
+      <button class="btn btn-audio" id="audio-toggle" type="button" aria-pressed="false">▶ Sound On — 신스 루프 시작</button>
+    </div>
+
+    <div class="dossier">
+      <dl class="spec-tags mono">
+        <div><dt>ENGINE</dt><dd>Web Audio API (OscillatorNode + AnalyserNode)</dd></div>
+        <div><dt>COST</dt><dd>오디오 스레드 별도 · 분석은 저렴</dd></div>
+        <div><dt>FALLBACK</dt><dd>Sound Off가 기본값 — 이것이 폴백</dd></div>
+      </dl>
+      <div class="dossier-cols">
+        <div>
+          <h3>네이티브</h3>
+          <p>Web Audio의 native는 <strong>노드 그래프</strong>다. 오실레이터 → 필터 → 게인 → 아날라이저 →
+          출력으로 신호가 흐르고, 어느 지점이든 탭해서 데이터를 읽을 수 있다.
+          이 표본의 신스도 mp3가 아니라 오실레이터 노드로 실시간 합성된 것.</p>
+        </div>
+        <div>
+          <h3>리스크</h3>
+          <p>자동재생 차단, 업무 환경에서의 거부감, 접근성, 모바일 배터리.
+          권장 UX는 명확하다 — <strong>Sound Off 기본 + 명시적 On 버튼 + 설정 기억 + 시각적 대체</strong>.</p>
+        </div>
+        <div>
+          <h3>응용 케이스</h3>
+          <p>뮤지션·레이블 사이트, 제품 사운드 디자인 쇼케이스, 스크롤 위치에 반응하는
+          앰비언트 레이어, 클릭·호버의 미세 효과음. 시각 반응은 표본 02·03과 바로 합성된다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 ADAPTIVE QUALITY ============ -->
+  <section class="specimen" id="adaptive">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 10 · 2026 핵심 트렌드</p>
+      <h2><span class="display">Adaptive Quality</span><span class="kr">모두에게 같은 장면을 강제하지 않는다</span></h2>
+      <p class="lede">
+        좌하단 HUD는 장식이 아니라 이 페이지의 실제 판정 결과다. 접속한 기기의 신호를 읽어
+        파티클 수, DPR 상한, 모션 여부를 조절하고 있다. 좋은 몰입형 사이트는
+        High/Mid/Low 티어별로 <strong>다른 장면</strong>을 서빙한다.
+      </p>
+    </header>
+
+    <div class="tier-table" id="tier-table">
+      <div class="tier-row" data-tier="high">
+        <h3 class="mono">HIGH</h3>
+        <p>WebGPU · 풀 파티클 · 포스트프로세싱 · 고해상 텍스처 · 실시간 그림자</p>
+      </div>
+      <div class="tier-row" data-tier="mid">
+        <h3 class="mono">MID</h3>
+        <p>WebGL2 · 파티클 축소 · 제한적 포스트 · 베이크드 라이팅</p>
+      </div>
+      <div class="tier-row" data-tier="low">
+        <h3 class="mono">LOW</h3>
+        <p>지오메트리 단순화 · 그림자 없음 · 비디오 또는 정적 폴백</p>
+      </div>
+      <p class="tier-verdict mono" id="tier-verdict">판정 중…</p>
+    </div>
+
+    <div class="dossier">
+      <div class="dossier-cols">
+        <div>
+          <h3>감지 신호</h3>
+          <p>화면 크기, devicePixelRatio, 메모리, GPU 티어, 네트워크 속도, 터치 여부,
+          WebGPU 지원, 그리고 <span class="mono inline-tag">prefers-reduced-motion</span>.
+          이 페이지는 그중 다섯 가지를 실제로 읽는다.</p>
+        </div>
+        <div>
+          <h3>가장 흔한 실수</h3>
+          <p><span class="mono inline-tag">setPixelRatio(devicePixelRatio)</span>를 무조건 쓰는 것.
+          DPR 3 폰에서 픽셀 수가 9배가 된다. 상한은
+          <span class="mono inline-tag">Math.min(dpr, 1.5)</span> — 이 페이지의 모든 캔버스가 그렇게 돌고 있다.</p>
+        </div>
+        <div>
+          <h3>측정 항목</h3>
+          <p>웹 지표(LCP·INP·CLS)만으로는 부족하다. FPS, frame time, draw call, 텍스처 메모리,
+          그리고 <strong>모바일 발열과 이탈률</strong>까지 — 몰입형 사이트의 성적표는 GPU 지표를 포함한다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 11 PIPELINE ============ -->
+  <section class="specimen" id="pipeline">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 11 · LAYER — PRODUCTION &amp; ASSET</p>
+      <h2><span class="display">Pipeline</span><span class="kr">형상은 코드 밖에서 온다</span></h2>
+      <p class="lede">
+        몰입형 웹은 웹 코드만으로 완성되지 않는다. 브라우저에서 실행할 수 없는 것들 —
+        모델링, 시뮬레이션, 텍스처 — 은 DCC 도구에서 만들어 <strong>구운(bake) 뒤 압축해서</strong> 가져온다.
+        이 표본은 라이브 데모가 아니라 지도다.
+      </p>
+    </header>
+
+    <div class="pipe-flow mono" aria-hidden="true">
+      <span>BLENDER / C4D / HOUDINI</span><span class="pipe-arrow">→</span>
+      <span>glTF / GLB</span><span class="pipe-arrow">→</span>
+      <span>DRACO · MESHOPT + KTX2</span><span class="pipe-arrow">→</span>
+      <span>CDN</span><span class="pipe-arrow">→</span>
+      <span>BROWSER</span>
+    </div>
+
+    <div class="pipe-grid">
+      <article class="pipe-card">
+        <h3>Blender <span class="mono tag-free">FREE</span></h3>
+        <p>웹 3D의 현실적 기본 도구. Geometry Nodes로 절차적 형상을 만들고 glTF로 내보낸다.
+        AI·Python 자동화와 궁합이 가장 좋다.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>Cinema 4D / Houdini</h3>
+        <p>모션그래픽(C4D)과 시뮬레이션(Houdini)의 강자. 단, 웹 런타임 도구가 아니라
+        <strong>에셋 생성 도구</strong> — 시뮬레이션은 캐시·텍스처·포인트 데이터로 변환해 가져온다.
+        "C4D에서 멋졌던 장면"의 상당 부분은 웹에서 재구성이 필요하다.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>glTF / GLB</h3>
+        <p>웹 3D의 표준 전송 포맷. 지오메트리·머티리얼·텍스처·애니메이션·계층을 한 파일에 담는다.
+        "3D계의 JPEG"라 불리는 이유.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>Draco vs Meshopt</h3>
+        <p>둘 다 메시 압축. Draco는 다운로드가 작지만 클라이언트 디코딩 비용이 있고,
+        Meshopt는 GPU 친화적 정점 최적화를 겸한다. 파일 크기만 보지 말고
+        <strong>디코딩 시간과 첫 프레임까지의 시간</strong>을 측정해 고른다.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>KTX2 / Basis</h3>
+        <p>텍스처를 GPU가 압축 상태 그대로 쓰는 포맷. VRAM과 전송량을 동시에 줄인다.
+        모델보다 <strong>텍스처가 더 큰 병목</strong>인 경우가 매우 많다 — 최적화 1순위.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>Spline / Rive / Lottie</h3>
+        <p>디자이너 직행 루트. Spline은 3D 히어로 한 장면의 임베드에, Rive는 상태 머신 기반
+        인터랙티브 벡터(버튼·마스코트 — Duolingo·Spotify Wrapped가 실사례)에, Lottie는 단순 벡터 모션에.
+        셋 다 <strong>사이트 전체 엔진이 아니라 모듈</strong>로 쓰는 것이 안전하다.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>예산 감각 <span class="mono tag-num">BUDGET</span></h3>
+        <p>초기 JS 500KB 이하, 초기 3D 에셋 1~3MB, 전체 3D·텍스처 5~10MB,
+        모바일 draw call 50~100 이하, Desktop 60fps / Mobile 30fps 안정.
+        고급 PC의 60fps는 성적이 아니다 — 중급 안드로이드에서 측정하라.</p>
+      </article>
+      <article class="pipe-card">
+        <h3>CMS 경계선</h3>
+        <p>CMS(Sanity·Contentful·Payload)에는 제목·본문·이미지·순서만.
+        카메라 좌표, 셰이더 파라미터, 타임라인을 CMS에 넣는 순간 시스템은 깨진다.
+        <span class="mono inline-tag">CMS = 콘텐츠, Code = 연출</span>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 12 RECIPES ============ -->
+  <section class="specimen" id="recipes">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 12 · 조합의 기술</p>
+      <h2><span class="display">Recipes</span><span class="kr">스택은 단품이 아니라 정식(定食)이다</span></h2>
+      <p class="lede">
+        기술 선택의 진짜 질문은 "무엇이 최신인가"가 아니라 <strong>"누가 시간을, 공간을, 상태를
+        소유하는가"</strong>다. 검증된 조합 — 이 페이지 자체는 A티어 레시피로 만들어졌다.
+      </p>
+    </header>
+
+    <div class="recipe-grid">
+      <article class="recipe-card" data-grade="S">
+        <p class="recipe-grade mono">S TIER</p>
+        <h3>실무 균형형</h3>
+        <p class="recipe-stack mono">Next.js + React Three Fiber + GSAP + Blender + glTF 최적화</p>
+        <p>운영형 브랜드 사이트의 기본기. CMS·다국어·로그인이 있다면 이쪽.
+        생태계와 채용, AI 코딩 도구와의 궁합까지 균형이 가장 좋다.
+        리스크는 React·R3F·GSAP·Lenis의 라이프사이클 충돌 — 역할 분리 원칙이 필수.</p>
+      </article>
+      <article class="recipe-card" data-grade="S">
+        <p class="recipe-grade mono">S TIER</p>
+        <h3>콘텐츠·성능형</h3>
+        <p class="recipe-stack mono">Astro + Three.js 또는 R3F Island + GSAP</p>
+        <p>대부분은 정적 HTML, 3D는 섬(island)으로 격리. 콘텐츠가 많고 히어로만 몰입형이라면
+        Next.js보다 이쪽이 정확하다. SEO와 초기 로드에 유리.</p>
+      </article>
+      <article class="recipe-card" data-grade="A">
+        <p class="recipe-grade mono">A TIER</p>
+        <h3>Creative Coding형 <span class="recipe-badge mono">THIS SITE</span></h3>
+        <p class="recipe-stack mono">Vite + TypeScript + Three.js + GLSL + GSAP + Lenis</p>
+        <p>렌더 루프를 완전히 직접 통제하는 한 편의 인터랙티브 작품. 단기 캠페인,
+        포트폴리오, 아트 디렉션 최우선 프로젝트의 선택지. 독창성은 최고,
+        개발자 개인 의존도가 리스크.</p>
+      </article>
+      <article class="recipe-card" data-grade="A">
+        <p class="recipe-grade mono">A TIER</p>
+        <h3>게임·공간형</h3>
+        <p class="recipe-stack mono">Babylon.js 또는 PlayCanvas + WebGPU/WebGL + 물리 + WebXR</p>
+        <p>"페이지를 본다"가 아니라 "공간을 플레이한다"면 엔진형 접근.
+        가상 쇼룸, 캐릭터 이동, XR. SEO·접근성은 별도 설계가 필요하다.</p>
+      </article>
+      <article class="recipe-card" data-grade="B">
+        <p class="recipe-grade mono">B TIER</p>
+        <h3>디자이너 속도형</h3>
+        <p class="recipe-stack mono">Framer / Webflow + Spline + Rive</p>
+        <p>일주일 안의 POC, 이벤트 페이지, 개발자 없는 팀. 시각 제작 속도는 최고지만
+        런타임이 여러 겹이라 최적화 통제가 어렵다. 검증 후 Three.js로 재구축하는
+        디딤돌로 쓰는 것이 정석.</p>
+      </article>
+      <article class="recipe-card" data-grade="F">
+        <p class="recipe-grade mono">FUTURE</p>
+        <h3>Generative WebGPU형</h3>
+        <p class="recipe-stack mono">Three.js WebGPURenderer + TSL + Compute Shader + WebGL2 폴백</p>
+        <p>수십만 파티클, 실시간 유체, GPU 연산이 표현 자체에 필요할 때만.
+        "WebGPU를 썼다"는 사실은 사용자 가치가 아니다 — 목표가 아니라 최적화 수단.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 13 ANTI-PATTERNS ============ -->
+  <section class="specimen" id="antipatterns">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 13 · 부검 기록</p>
+      <h2><span class="display">Anti-patterns</span><span class="kr">죽은 사이트들의 공통 사인(死因)</span></h2>
+    </header>
+
+    <ol class="autopsy">
+      <li>
+        <h3>도구 전부 넣기 <span class="mono">GSAP + Motion + Lenis + Theatre + Spline</span></h3>
+        <p>각각은 좋은 도구지만 한 프로젝트에 다 넣으면 "누가 카메라를 움직이는가"의 답이
+        여러 개가 된다. 같은 속성을 두 라이브러리가 제어하는 순간 값은 덮어써진다.
+        <strong>GSAP=시간, R3F=공간, React=상태, Lenis=스크롤 입력</strong> — 소유권을 하나씩만.</p>
+      </li>
+      <li>
+        <h3>전체 페이지를 Canvas로</h3>
+        <p>SEO 소멸, 접근성 소멸, 텍스트 품질 저하, 복사·링크·입력 전부 재구현.
+        제목과 본문은 실제 HTML로, Canvas는 <span class="mono inline-tag">aria-hidden</span> 시각 레이어로.
+        이 페이지의 모든 표본이 그 구조다.</p>
+      </li>
+      <li>
+        <h3>4K 텍스처와 실시간 그림자 남발</h3>
+        <p>시각 차이는 작고 VRAM·대역폭은 폭증한다. 512~2048 텍스처 + KTX2 + 베이크가 정답인 경우가 대부분.</p>
+      </li>
+      <li>
+        <h3>모바일 = 데스크톱의 축소판</h3>
+        <p>모바일에는 다른 장면이 필요할 수 있다. Desktop은 인터랙티브 3D,
+        Mobile은 축소 3D, 저사양은 비디오, reduced-motion은 정적 이미지 — 티어별 서빙이 기본.</p>
+      </li>
+      <li>
+        <h3>모든 애니메이션을 스크롤에 묶기</h3>
+        <p>사용자는 스크롤을 콘텐츠 탐색에 쓴다. 모든 물체가 매 순간 반응하면 피로하고
+        정보 위계가 사라진다. 연출은 밀도가 아니라 <strong>배치</strong>다.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============ 14 REFERENCES ============ -->
+  <section class="specimen" id="references">
+    <header class="specimen-head">
+      <p class="eyebrow">SPECIMEN 14 · 필드 노트</p>
+      <h2><span class="display">References</span><span class="kr">직접 가서 관찰할 것</span></h2>
+      <p class="lede">표본실 밖의 살아있는 개체들. 기술이 실전에서 어떻게 조합되는지는 결국 현장에서 배운다.</p>
+    </header>
+
+    <div class="ref-grid">
+      <a class="ref-card" href="https://igloo.inc" target="_blank" rel="noopener">
+        <p class="ref-tag mono">3D NARRATIVE</p>
+        <h3>Igloo Inc</h3>
+        <p>Awwwards Site of the Year 2025. 절차적 얼음 결정, 셰이더 UI, 스크롤로 표류하는 카메라 —
+        현재 스크롤 3D 내러티브의 정점. Codrops에 기술 해부 글이 있다.</p>
+      </a>
+      <a class="ref-card" href="https://lusion.co" target="_blank" rel="noopener">
+        <p class="ref-tag mono">SHADER / PARTICLES</p>
+        <h3>Lusion</h3>
+        <p>커서 반응 유체·파티클의 프로덕션 크래프트가 어디까지 가는지 보여주는 스튜디오.
+        표본 02·03의 실전 최상급 사례.</p>
+      </a>
+      <a class="ref-card" href="https://www.apple.com/airpods-pro/" target="_blank" rel="noopener">
+        <p class="ref-tag mono">SCROLLYTELLING</p>
+        <h3>Apple — AirPods Pro</h3>
+        <p>스크럽되는 이미지 시퀀스 + 동기화된 카피. 상업적 스크롤리텔링의 정석 패턴.</p>
+      </a>
+      <a class="ref-card" href="https://pudding.cool" target="_blank" rel="noopener">
+        <p class="ref-tag mono">SCROLLYTELLING</p>
+        <h3>The Pudding</h3>
+        <p>데이터가 이야기를 끌고 가는 절제된 스크롤리텔링. 연출이 아니라 콘텐츠가 주인공일 때의 교본.</p>
+      </a>
+      <a class="ref-card" href="https://lenis.darkroom.engineering" target="_blank" rel="noopener">
+        <p class="ref-tag mono">SMOOTH SCROLL</p>
+        <h3>Lenis — darkroom.engineering</h3>
+        <p>라이브러리 사이트 자체가 최고의 감각 레퍼런스. 쇼케이스에 GTA VI, Lando Norris 등이 올라 있다.</p>
+      </a>
+      <a class="ref-card" href="https://www.rockstargames.com/VI" target="_blank" rel="noopener">
+        <p class="ref-tag mono">ADAPTIVE QUALITY</p>
+        <h3>GTA VI</h3>
+        <p>대규모 시네마틱 스크롤 + 모바일에는 프리렌더 시퀀스 폴백. 소비자 스케일에서의 티어 서빙 실례.</p>
+      </a>
+      <a class="ref-card" href="https://basement.studio" target="_blank" rel="noopener">
+        <p class="ref-tag mono">3D NARRATIVE</p>
+        <h3>basement.studio</h3>
+        <p>케이스 스터디 화면들이 물리 반응하는 3D 평면 텍스처로 사는 스튜디오 사이트.</p>
+      </a>
+      <a class="ref-card" href="https://tympanus.net/codrops/" target="_blank" rel="noopener">
+        <p class="ref-tag mono">LEARNING</p>
+        <h3>Codrops</h3>
+        <p>오픈소스 데모 + 튜토리얼 + 스튜디오 해부 글의 보고. 이 표본실의 다음 단계는 여기다.</p>
+      </a>
+      <a class="ref-card" href="https://thebookofshaders.com" target="_blank" rel="noopener">
+        <p class="ref-tag mono">LEARNING</p>
+        <h3>The Book of Shaders</h3>
+        <p>GLSL 입문의 표준 무료 교재. 표본 02가 흥미로웠다면 첫 페이지를 열어라.</p>
+      </a>
+      <a class="ref-card" href="https://threejs-journey.com" target="_blank" rel="noopener">
+        <p class="ref-tag mono">LEARNING</p>
+        <h3>Three.js Journey</h3>
+        <p>사실상의 표준 커리큘럼. 파티클 커서, 스크롤 카메라 등 이 페이지 기법 대부분의 원전 수업이 있다.</p>
+      </a>
+      <a class="ref-card" href="https://scroll-driven-animations.style" target="_blank" rel="noopener">
+        <p class="ref-tag mono">PURE CSS</p>
+        <h3>scroll-driven-animations.style</h3>
+        <p>CSS animation-timeline의 결정판 데모 허브. JS 없는 ScrollTrigger의 세계.</p>
+      </a>
+      <a class="ref-card" href="https://rive.app/blog/case-studies" target="_blank" rel="noopener">
+        <p class="ref-tag mono">VECTOR MOTION</p>
+        <h3>Rive Case Studies</h3>
+        <p>Duolingo 캐릭터 립싱크, Spotify Wrapped 2025 — 상태 머신 벡터 애니메이션의 실전 규모.</p>
+      </a>
+      <a class="ref-card" href="https://sparkjs.dev" target="_blank" rel="noopener">
+        <p class="ref-tag mono">GAUSSIAN SPLATTING</p>
+        <h3>Spark</h3>
+        <p>Three.js용 가우시안 스플랫 렌더러의 현재 선두. 현실 공간을 웹에서 탐색하는 기술의 입구.</p>
+      </a>
+      <a class="ref-card" href="https://www.awwwards.com" target="_blank" rel="noopener">
+        <p class="ref-tag mono">GALLERY</p>
+        <h3>Awwwards</h3>
+        <p>매일 갱신되는 수상작 갤러리. WebGL·GSAP·Web Audio 컬렉션이 이 표본실의 분류와 거의 1:1로 대응한다.</p>
+      </a>
+      <a class="ref-card" href="https://www.unicorn.studio" target="_blank" rel="noopener">
+        <p class="ref-tag mono">NO-CODE</p>
+        <h3>Unicorn Studio</h3>
+        <p>GLSL 없이 셰이더 룩을 만드는 노코드 WebGL 에디터. 아트디렉터가 직접 실험하기 좋은 입구.</p>
+      </a>
+      <a class="ref-card" href="https://14islands.com" target="_blank" rel="noopener">
+        <p class="ref-tag mono">ADAPTIVE QUALITY</p>
+        <h3>14islands</h3>
+        <p>"콘텐츠는 JS 없이도 렌더되고, WebGL은 그 위에 얹힌다" — 점진적 향상 방법론을 공개한 드문 스튜디오.</p>
+      </a>
+    </div>
+  </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p class="display footer-mark">Immersive&nbsp;Atlas</p>
+    <p>이 페이지 자체가 표본이다 — Vite + TypeScript + Three.js + GLSL + GSAP + Lenis,
+    Semantic DOM 위의 GPU 레이어, DPR 상한 1.5, reduced-motion 폴백, Sound Off 기본.<br />
+    원전: <em>Immersive Website 기술 스택 총정리, 2026</em></p>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
